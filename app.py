@@ -46,7 +46,7 @@ def chat():
 
     def generate_stream():
         try:
-            response_stream = client.responses.create(
+            with client.responses.stream(
                 model="gpt-4.1-mini",
                 input=[
                     {
@@ -56,18 +56,17 @@ def chat():
                     for msg in messages
                 ],
                 max_output_tokens=350,
-                stream=True,
-            )
+            ) as response_stream:
+                for event in response_stream:
+                    if event.type == "response.output_text.delta":
+                        delta = event.delta or ""
+                        if delta:
+                            yield f"data: {json.dumps({'delta': delta})}\n\n"
+                    elif event.type == "response.error":
+                        error_message = getattr(event, "error", {}) or {}
+                        message = error_message.get("message") if isinstance(error_message, dict) else str(error_message)
+                        yield f"data: {json.dumps({'error': message or 'Unknown error'})}\n\n"
 
-            for event in response_stream:
-                if event.type == "response.output_text.delta":
-                    delta = event.delta or ""
-                    if delta:
-                        yield f"data: {json.dumps({'delta': delta})}\n\n"
-                elif event.type == "response.error":
-                    error_message = getattr(event, "error", {}) or {}
-                    message = error_message.get("message") if isinstance(error_message, dict) else str(error_message)
-                    yield f"data: {json.dumps({'error': message or 'Unknown error'})}\n\n"
             yield "data: [DONE]\n\n"
         except Exception as exc:  # pragma: no cover
             yield f"data: {json.dumps({'error': 'Unable to get AI response', 'details': str(exc)})}\n\n"

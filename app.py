@@ -17,8 +17,16 @@ You are MindFlow AI, a supportive, trauma-informed mental health companion.
 """
 
 
-@app.route("/api/chat", methods=["POST"])
+@app.route("/api/chat", methods=["GET", "POST"])
 def chat():
+    if request.method == "GET":
+        return jsonify(
+            {
+                "status": "ok",
+                "message": "Send a POST request with a JSON body containing a message to receive a reply.",
+            }
+        )
+
     data = request.get_json(force=True)
     user_message = (data.get("message") or "").strip()
     conversation = data.get("conversation") or []

@@ -1,5 +1,6 @@
+import json
 import os
-from flask import Flask, jsonify, request, send_from_directory
+from flask import Flask, Response, jsonify, request, send_from_directory
 from flask_cors import CORS
 from openai import OpenAI
 
@@ -43,17 +44,35 @@ def chat():
             messages.append({"role": mapped_role, "content": content})
     messages.append({"role": "user", "content": user_message})
 
-    try:
-        response = client.responses.create(
-            model="gpt-4.1-mini",
-            input=[{"role": msg["role"], "content": [{"type": "text", "text": msg["content"]}]} for msg in messages],
-            max_output_tokens=350,
-        )
-        ai_message = response.output_text
-    except Exception as exc:  # pragma: no cover
-        return jsonify({"error": "Unable to get AI response", "details": str(exc)}), 500
+    def generate_stream():
+        try:
+            response_stream = client.responses.create(
+                model="gpt-4.1-mini",
+                input=[
+                    {
+                        "role": msg["role"],
+                        "content": [{"type": "text", "text": msg["content"]}],
+                    }
+                    for msg in messages
+                ],
+                max_output_tokens=350,
+                stream=True,
+            )
 
-    return jsonify({"reply": ai_message})
+            for event in response_stream:
+                if event.type == "response.output_text.delta":
+                    delta = event.delta or ""
+                    if delta:
+                        yield f"data: {json.dumps({'delta': delta})}\n\n"
+                elif event.type == "response.error":
+                    error_message = getattr(event, "error", {}) or {}
+                    message = error_message.get("message") if isinstance(error_message, dict) else str(error_message)
+                    yield f"data: {json.dumps({'error': message or 'Unknown error'})}\n\n"
+            yield "data: [DONE]\n\n"
+        except Exception as exc:  # pragma: no cover
+            yield f"data: {json.dumps({'error': 'Unable to get AI response', 'details': str(exc)})}\n\n"
+
+    return Response(generate_stream(), mimetype="text/event-stream")
 
 
 @app.route("/")

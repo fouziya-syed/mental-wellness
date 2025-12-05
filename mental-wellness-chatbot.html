@@ -361,6 +361,20 @@
             color: var(--sage);
         }
 
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: rgba(76, 175, 80, 0.12);
+            border: 1px solid rgba(165, 214, 167, 0.25);
+            color: var(--mint);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
         .header-actions {
             display: flex;
             gap: 12px;
@@ -1039,8 +1053,9 @@
                         </svg>
                     </div>
                     <div class="bot-info">
-                        <h2>Wellness Assistant</h2>
-                        <span>● Online — Here to help</span>
+                        <h2>MindFlow AI</h2>
+                        <span>● Online — Compassionate support</span>
+                        <div class="ai-badge">AI Guided Companion</div>
                     </div>
                 </div>
                 <div class="header-actions">
@@ -1067,8 +1082,8 @@
                             <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
                         </svg>
                     </div>
-                    <h1>Welcome to MindFlow</h1>
-                    <p>I'm here to support your mental wellness journey. Share how you're feeling, and let's work through it together in a safe, judgment-free space.</p>
+                    <h1>Welcome to MindFlow AI</h1>
+                    <p>MindFlow AI offers gentle, mental-wellness focused responses. Share how you're feeling, and we'll explore supportive next steps together. This AI companion doesn't replace professional care, but it can help you feel heard and supported.</p>
                     
                     <div class="quick-actions">
                         <div class="quick-action" onclick="sendQuickMessage('I\'m feeling stressed today')">
@@ -1077,8 +1092,8 @@
                                     <path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/>
                                 </svg>
                             </div>
-                            <h3>Feeling Stressed</h3>
-                            <p>Let's talk about stress relief</p>
+                            <h3>AI Stress Support</h3>
+                            <p>Let's talk about relief techniques</p>
                         </div>
                         <div class="quick-action" onclick="sendQuickMessage('I need help with anxiety')">
                             <div class="quick-action-icon">
@@ -1086,7 +1101,7 @@
                                     <path d="M4.318 6.318a4.5 4.5 0 0 0 0 6.364L12 20.364l7.682-7.682a4.5 4.5 0 0 0-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 0 0-6.364 0z"/>
                                 </svg>
                             </div>
-                            <h3>Anxiety Support</h3>
+                            <h3>AI Anxiety Support</h3>
                             <p>Breathing & grounding exercises</p>
                         </div>
                         <div class="quick-action" onclick="sendQuickMessage('Guide me through meditation')">
@@ -1095,7 +1110,7 @@
                                     <path d="M12 2v4m0 12v4M4.93 4.93l2.83 2.83m8.48 8.48l2.83 2.83M2 12h4m12 0h4M4.93 19.07l2.83-2.83m8.48-8.48l2.83-2.83"/>
                                 </svg>
                             </div>
-                            <h3>Guided Meditation</h3>
+                            <h3>AI-Guided Meditation</h3>
                             <p>Find your inner calm</p>
                         </div>
                         <div class="quick-action" onclick="sendQuickMessage('I want to journal my thoughts')">
@@ -1105,7 +1120,7 @@
                                     <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                                 </svg>
                             </div>
-                            <h3>Start Journaling</h3>
+                            <h3>AI Journaling Prompt</h3>
                             <p>Express your thoughts freely</p>
                         </div>
                     </div>
@@ -1252,29 +1267,7 @@
         const messagesContainer = document.getElementById('messagesContainer');
         const messageInput = document.getElementById('messageInput');
         let isFirstMessage = true;
-
-        const botResponses = {
-            stress: {
-                message: "I hear you, and it's completely valid to feel stressed. Let's work through this together. Would you like to try a quick breathing exercise, or would you prefer to talk about what's causing your stress?",
-                sentiment: "stressed"
-            },
-            anxiety: {
-                message: "Thank you for sharing that with me. Anxiety can feel overwhelming, but you're not alone. Let me guide you through a grounding technique: Name 5 things you can see, 4 you can touch, 3 you can hear, 2 you can smell, and 1 you can taste. Take your time.",
-                sentiment: "neutral"
-            },
-            meditation: {
-                message: "I'd love to guide you through a meditation. Find a comfortable position, close your eyes if you'd like, and take a deep breath in... hold... and slowly release. Let's continue for 5 minutes. Are you ready?",
-                sentiment: "positive"
-            },
-            journal: {
-                message: "Journaling is a wonderful way to process emotions. Here's a prompt to get you started: 'What's one thing that brought you even a small moment of peace today?' Take your time, there's no right or wrong answer.",
-                sentiment: "positive"
-            },
-            default: {
-                message: "Thank you for sharing. I'm here to listen and support you. Could you tell me more about how you're feeling right now? Remember, this is a safe space.",
-                sentiment: "neutral"
-            }
-        };
+        const conversationHistory = [];
 
         function getCurrentTime() {
             return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -1291,31 +1284,20 @@
             }
         }
 
-        function addMessage(text, isUser = false, sentiment = null) {
+        function addMessage(text, isUser = false) {
             clearWelcome();
-            
+
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
-            
-            const avatarSvg = isUser 
+
+            const avatarSvg = isUser
                 ? '<svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>'
                 : '<svg viewBox="0 0 24 24"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h1a7 7 0 0 1 7 7h1a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v1a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-1H2a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h1a7 7 0 0 1 7-7h1V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13A2.5 2.5 0 0 0 5 15.5 2.5 2.5 0 0 0 7.5 18a2.5 2.5 0 0 0 2.5-2.5A2.5 2.5 0 0 0 7.5 13m9 0a2.5 2.5 0 0 0-2.5 2.5 2.5 2.5 0 0 0 2.5 2.5 2.5 2.5 0 0 0 2.5-2.5 2.5 2.5 0 0 0-2.5-2.5z"/></svg>';
-
-            let sentimentTag = '';
-            if (sentiment && !isUser) {
-                const sentimentLabels = {
-                    positive: '😊 Positive',
-                    neutral: '😐 Neutral', 
-                    stressed: '😰 Stressed'
-                };
-                sentimentTag = `<div class="sentiment-tag ${sentiment}">${sentimentLabels[sentiment]}</div>`;
-            }
 
             messageDiv.innerHTML = `
                 <div class="message-avatar">${avatarSvg}</div>
                 <div class="message-content">
                     <div class="message-bubble">${text}</div>
-                    ${sentimentTag}
                     <div class="message-time">${getCurrentTime()}</div>
                 </div>
             `;
@@ -1347,34 +1329,45 @@
             if (typing) typing.remove();
         }
 
-        function getBotResponse(userMessage) {
-            const msg = userMessage.toLowerCase();
-            if (msg.includes('stress') || msg.includes('stressed') || msg.includes('overwhelm')) {
-                return botResponses.stress;
-            } else if (msg.includes('anxiety') || msg.includes('anxious') || msg.includes('worried') || msg.includes('panic')) {
-                return botResponses.anxiety;
-            } else if (msg.includes('meditat') || msg.includes('calm') || msg.includes('relax') || msg.includes('breath')) {
-                return botResponses.meditation;
-            } else if (msg.includes('journal') || msg.includes('write') || msg.includes('thought')) {
-                return botResponses.journal;
+        async function fetchAIResponse(text) {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: text,
+                    conversation: conversationHistory,
+                }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json().catch(() => ({}));
+                throw new Error(error.error || 'Unable to reach MindFlow AI');
             }
-            return botResponses.default;
+
+            const data = await response.json();
+            return data.reply || 'Sorry, I could not generate a response right now.';
         }
 
-        function sendMessage() {
+        async function sendMessage() {
             const text = messageInput.value.trim();
             if (!text) return;
 
             addMessage(text, true);
+            conversationHistory.push({ role: 'user', content: text });
             messageInput.value = '';
 
             showTyping();
 
-            setTimeout(() => {
+            try {
+                const reply = await fetchAIResponse(text);
                 hideTyping();
-                const response = getBotResponse(text);
-                addMessage(response.message, false, response.sentiment);
-            }, 1500 + Math.random() * 1000);
+                addMessage(reply, false);
+                conversationHistory.push({ role: 'assistant', content: reply });
+            } catch (error) {
+                hideTyping();
+                addMessage('I am sorry, I could not connect right now. Please check your connection and try again.', false);
+                console.error(error);
+            }
         }
 
         function sendQuickMessage(text) {
